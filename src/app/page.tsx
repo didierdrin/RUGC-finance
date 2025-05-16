@@ -1,103 +1,69 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useMemo } from 'react';
+
+const MOCK_MESSAGES = [
+  "You have received 3500 RWF from Didier Nsengiyumva(*********640) on your mobile money account at 2025-05-14 08:58:17. Message from sender: . Your new balance: 3501 RWF. Financial Transaction Id: 20618287212.",
+  "You have received 12000 RWF from Grace Uwase(*********123) on your mobile money account at 2025-05-14 09:35:00. Message from sender: . Your new balance: 12500 RWF. Financial Transaction Id: 20618287213.",
+  "You have received 5400 RWF from Eric Mugisha(*********456) on your mobile money account at 2025-05-14 10:10:00. Message from sender: . Your new balance: 5800 RWF. Financial Transaction Id: 20618287214.",
+  "You have received 8900 RWF from Alice Umutoni(*********789) on your mobile money account at 2025-05-14 10:47:00. Message from sender: . Your new balance: 9100 RWF. Financial Transaction Id: 20618287215.",
+  "You have received 7500 RWF from Sandrine Ingabire(*********111) on your mobile money account at 2025-05-15 08:20:00. Message from sender: . Your new balance: 7700 RWF. Financial Transaction Id: 20618287216.",
+  "You have received 4100 RWF from Jean Bosco(*********222) on your mobile money account at 2025-05-15 09:55:00. Message from sender: . Your new balance: 4500 RWF. Financial Transaction Id: 20618287217.",
+  "You have received 6200 RWF from Diane Uwimana(*********333) on your mobile money account at 2025-05-15 11:30:00. Message from sender: . Your new balance: 6300 RWF. Financial Transaction Id: 20618287218.",
+  "You have received 3000 RWF from Patrick Habimana(*********444) on your mobile money account at 2025-05-16 08:00:00. Message from sender: . Your new balance: 3200 RWF. Financial Transaction Id: 20618287219.",
+  "You have received 9900 RWF from Kevin Niyonzima(*********555) on your mobile money account at 2025-05-16 09:30:00. Message from sender: . Your new balance: 10000 RWF. Financial Transaction Id: 20618287220.",
+  "You have received 6700 RWF from Juvenal Nsengiyumva(*********666) on your mobile money account at 2025-05-16 11:10:00. Message from sender: . Your new balance: 6900 RWF. Financial Transaction Id: 20618287221.",
+];
+
+
+
+
+export default function Dashboard() {
+  const transactions = useMemo(() => {
+    return MOCK_MESSAGES.map((msg) => {
+      const amount = parseInt(msg.match(/received (\d+) RWF/)?.[1] || '0', 10);
+      const timestamp = msg.match(/at ([\d-]+) [\d:]+/)?.[1] || '';
+      return { amount, date: timestamp };
+    });
+  }, []);
+
+  const dailyTotals = useMemo(() => {
+    const totals: Record<string, number> = {};
+    for (const txn of transactions) {
+      if (!totals[txn.date]) {
+        totals[txn.date] = 0;
+      }
+      totals[txn.date] += txn.amount;
+    }
+    return Object.entries(totals).map(([date, total]) => ({ date, total }));
+  }, [transactions]);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <main className="px-8 max-w-7xl mx-auto">
+      <h1 className="text-xl font-bold mb-6">Dashboard Overview</h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      <div className="bg-white rounded-xl shadow p-6">
+        <h2 className="text-lg font-semibold mb-4">Daily Payments Received</h2>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={dailyTotals}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="total" fill="#16a34a" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </main>
   );
 }
+
+// export default function Dashboard() {
+//   return (
+//     <div className="px-8 mx-auto max-w-7xl">
+//       <h2 className=" text-2xl font-semibold mb-4 text-green-700">Dashboard</h2>
+//       <p>Welcome to the Golf Course Finance Dashboard!</p>
+//     </div>
+//   );
+// }
